@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("UnitTests")]
 namespace XrayCS
 {
     class ComponentMap
@@ -59,10 +61,20 @@ namespace XrayCS
             }
         }
 
-        public int Lookup(string qualifiedTypename, bool throwOnError = true)
+        public int Lookup(Type component, bool throwOnError = true)
         {
-            Type Component = Type.GetType(qualifiedTypename);
-            return Lookup<Component>();
+            if (_map.ContainsKey(component))
+            {
+                return _map.GetValueOrDefault(component);
+            }
+            else if(throwOnError)
+            {
+                throw new ArgumentException("Component " + typeof(Component).ToString() + " not located in map.");
+            }
+            else
+            {
+                return -1;
+            }
         }
     }
 }
