@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.489
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XrayCS", "ECS\XrayCS.csproj", "{BF313B32-4AC3-4F4A-8867-D4EF9B063119}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XrayCS", "XrayCS\XrayCS.csproj", "{BF313B32-4AC3-4F4A-8867-D4EF9B063119}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{9BCE78E2-EC46-4C5A-954D-9B7E0B0D556D}"
 	ProjectSection(ProjectDependencies) = postProject

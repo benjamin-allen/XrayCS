@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ECS\XrayCS.csproj" />
+    <ProjectReference Include="..\XrayCS\XrayCS.csproj" />
   </ItemGroup>
 
 </Project>
