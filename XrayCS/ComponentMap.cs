@@ -19,7 +19,7 @@ namespace XrayCS
             _maximumSize = maximumSize;
         }
 
-        public int Register<Component>()
+        public int Register<Component>() where Component : XrayCS.Component
         {
             if(Size < MaximumSize)
             {
@@ -40,12 +40,12 @@ namespace XrayCS
             }
         }
 
-        public bool Contains<Component>()
+        public bool Contains<Component>() where Component : XrayCS.Component
         {
             return _map.ContainsKey(typeof(Component));
         }
 
-        public int Lookup<Component>(bool throwOnError = true)
+        public int Lookup<Component>(bool throwOnError = true) where Component : XrayCS.Component
         {
             if(Contains<Component>())
             {
@@ -63,13 +63,17 @@ namespace XrayCS
 
         public int Lookup(Type component, bool throwOnError = true)
         {
+            if (! (component.IsSubclassOf(typeof(XrayCS.Component)) || component.Equals(typeof(XrayCS.Component))) )
+            {
+                throw new ArgumentException("Type " + component.ToString() + " is not derived from XrayCS.Component");
+            }
             if (_map.ContainsKey(component))
             {
                 return _map.GetValueOrDefault(component);
             }
             else if(throwOnError)
             {
-                throw new ArgumentException("Component " + typeof(Component).ToString() + " not located in map.");
+                throw new ArgumentException("Component " + component.ToString() + " not located in map.");
             }
             else
             {

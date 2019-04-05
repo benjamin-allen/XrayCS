@@ -113,7 +113,7 @@ namespace UnitTests
 
         [TestMethod]
         [ExpectedException(typeof(System.ArgumentException), "throwOnError was set, and a component was not in the map, but an exception was not thrown.")]
-        public void LookupFailsWithNonRegisteredComponent()
+        public void PreventLookupOfNonRegisteredComponent()
         {
             Assert.AreEqual(map.Lookup<A>(false), -1);
             map.Lookup<A>();
@@ -130,10 +130,19 @@ namespace UnitTests
 
         [TestMethod]
         [ExpectedException(typeof(System.ArgumentException), "throwOnError was set, and a component was not in the map, but an exception was not thrown.")]
-        public void LookupByTypeFailsWithNonRegisteredComponent()
+        public void PreventLookupByTypeOfNonRegisteredComponent()
         {
             Assert.AreEqual(map.Lookup(Type.GetType("A"), false), -1);
             map.Lookup(Type.GetType("A"));       // Should throw an ArgumentException
+        }
+
+        [DataTestMethod]
+        [DataRow(typeof(int))]
+        [DataRow(typeof(Object))]
+        [ExpectedException(typeof(System.ArgumentException), "A non-subclass of XrayCS.Component was not prevented from begin looked up.")]
+        public void PreventLookupOfNonSubclass(Type type)
+        {
+            map.Lookup(type);    // We have to check this one directly because it's not enforced by the compiler
         }
     }
 }
