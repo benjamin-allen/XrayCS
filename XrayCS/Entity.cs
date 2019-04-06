@@ -88,5 +88,10 @@ namespace XrayCS
             }
             return null;
         }
+
+        public bool Has<Component>() where Component : XrayCS.Component
+        {
+            return Get<Component>(false) != null;
+        }
     }
 }

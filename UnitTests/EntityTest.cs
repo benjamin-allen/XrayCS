@@ -168,5 +168,18 @@ namespace UnitTests
         }
 
         #endregion
+        #region Has<>() Tests
+
+        [TestMethod]
+        public void HasReturnsExpectedValues()
+        {
+            entity.Add<A>();
+            Assert.AreEqual(entity.Has<A>(), true);
+            Assert.AreEqual(entity.Has<B>(), false);
+            entity.Remove<A>();
+            Assert.AreEqual(entity.Has<A>(), false);
+        }
+
+        #endregion
     }
 }
