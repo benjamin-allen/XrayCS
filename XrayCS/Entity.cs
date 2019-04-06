@@ -93,5 +93,27 @@ namespace XrayCS
         {
             return Get<Component>(false) != null;
         }
+
+        public bool HasAll(Type[] components)
+        {
+            bool hasAll = true;
+            foreach (Type type in components)
+            {
+                int index = _map.Lookup(type);
+                hasAll &= (index  > -1 && _data[index] != null);
+            }
+            return hasAll;
+        }
+
+        public bool HasAny(Type[] components)
+        {
+            bool hasAny = false;
+            foreach (Type type in components)
+            {
+                int index = _map.Lookup(type);
+                hasAny |= (index > -1 && _data[index] != null);
+            }
+            return hasAny;
+        }
     }
 }
