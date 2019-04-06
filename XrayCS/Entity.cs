@@ -97,6 +97,10 @@ namespace XrayCS
         public bool HasAll(Type[] components)
         {
             bool hasAll = true;
+            if (components.Length == 0)
+            {
+                hasAll = false;
+            } 
             foreach (Type type in components)
             {
                 int index = _map.Lookup(type, false);
@@ -114,6 +118,11 @@ namespace XrayCS
                 hasAny |= (index > -1 && _data[index] != null);
             }
             return hasAny;
+        }
+
+        public bool HasExcluding(Type[] toMatch, Type[] toExclude)
+        {
+            return HasAll(toMatch) && !HasAny(toExclude);
         }
     }
 }

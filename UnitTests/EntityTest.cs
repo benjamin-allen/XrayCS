@@ -205,6 +205,26 @@ namespace UnitTests
             Assert.AreEqual(entity.HasAny(arr3), false);
         }
 
+        [TestMethod]
+        public void ComplexMatchFunctions()
+        {
+            entity.Add<A>();
+            entity.Add<B>();
+            entity.Add<C>();
+            Type[] match1 = { typeof(A), typeof(B) };
+            Type[] exclude1 = { typeof(C) };
+            Assert.AreEqual(entity.HasExcluding(match1, exclude1), false);
+            entity.Remove<C>();
+            Assert.AreEqual(entity.HasExcluding(match1, exclude1), true);
+            Type[] match2 = { };
+            Type[] exclude2 = { };
+            Assert.AreEqual(entity.HasExcluding(match2, exclude2), false);
+            Type[] match3 = {typeof(C)};
+            Type[] exclude3 = { };
+            Assert.AreEqual(entity.HasExcluding(match3, exclude3), false);
+            Assert.AreEqual(entity.HasExcluding(exclude3, match3), false);
+        }
+
         #endregion
     }
 }
