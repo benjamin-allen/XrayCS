@@ -10,15 +10,18 @@ class MoveEvent : XrayCS.Event
     public int Dx { get => _dx; set => _dx = value; }
     public int Dy { get => _dy; set => _dy = value; }
 
-    public MoveEvent(Entity source = null, Type[] excludes = null)
-        : base(source, new Type[] {typeof(PositionComponent)}, excludes) { }
+    public MoveEvent()
+        : base(null, new Type[] {typeof(PositionComponent)}, null) { }
 
     public MoveEvent(int dx, int dy, Entity source = null, Type[] excludes = null)
-        : this(source, excludes)
+        : this(source, new Type[] { typeof(PositionComponent) }, excludes)
     {
         Dx = dx;
         Dy = dy;
     }
+
+    public MoveEvent(Entity source = null, Type[] matches = null, Type[] excludes = null)
+        : base(source, matches, excludes) { }
 
     public override void CallOnMatch(Entity entity)
     {
@@ -71,7 +74,7 @@ namespace UnitTests
             MoveEvent moveEvent3 = new MoveEvent(entity);
             Assert.AreEqual(moveEvent3.Source, entity);
 
-            MoveEvent moveEvent4 = new MoveEvent(null, new Type[] {typeof(A)});
+            MoveEvent moveEvent4 = new MoveEvent(null, new Type[] { typeof(PositionComponent) }, new Type[] {typeof(A)});
             Assert.AreEqual(moveEvent4.Matches[0], typeof(PositionComponent));
             Assert.AreEqual(moveEvent4.Matches.Length, 1);
             Assert.AreEqual(moveEvent4.Excludes[0], typeof(A));
@@ -83,6 +86,50 @@ namespace UnitTests
             Assert.AreEqual(moveEvent5.Source, entity);
             Assert.AreEqual(moveEvent5.Matches.Length, 1);
             Assert.AreEqual(moveEvent5.Excludes.Length, 0);
+        }
+
+        [DataTestMethod]
+        [DataRow(1, 4)]
+        [DataRow(-1, -490)]
+        [DataRow(0, 0)]
+        [DataRow(-1, 1)]
+        public void DispatchAppliesResults(int dx, int dy)
+        {
+            MoveEvent moveEvent = new MoveEvent(dx, dy);
+            moveEvent.DispatchToEntity(entity);
+            PositionComponent pc = entity.Get<PositionComponent>();
+            Assert.AreEqual(pc.X, dx);
+            Assert.AreEqual(pc.Y, dy);
+            moveEvent.DispatchToEntity(entity);
+            Assert.AreEqual(pc.X, 2*dx);
+            Assert.AreEqual(pc.Y, 2*dy);
+
+            MoveEvent moveEvent2 = new MoveEvent(dx, dy, null, new Type[] {typeof(C)});
+            moveEvent.DispatchToEntity(entity);
+            Assert.AreEqual(pc.X, 3*dx);
+            Assert.AreEqual(pc.Y, 3*dy);
+        }
+
+        [TestMethod]
+        public void PreventIllegalDispatch()
+        {
+            PositionComponent pre = entity.Get<PositionComponent>().Clone();
+            MoveEvent moveEvent = new MoveEvent(pre.X + 1,pre.Y - 1,null, new Type[] {typeof(PositionComponent)});
+            moveEvent.DispatchToEntity(entity);
+            PositionComponent pc = entity.Get<PositionComponent>();
+            Assert.AreEqual(pre.X, pc.X);
+            Assert.AreEqual(pre.Y, pc.Y);
+        }
+
+        [TestMethod]
+        public void PreventCallsWithNoMatchesNoExcludes()
+        {
+            MoveEvent moveEvent = new MoveEvent(null, null, null);
+            moveEvent.Dx = 5;
+            moveEvent.Dy = 5;
+            moveEvent.DispatchToEntity(entity);
+            Assert.AreEqual(entity.Get<PositionComponent>().X, 0);
+            Assert.AreEqual(entity.Get<PositionComponent>().Y, 0);
         }
     }
 }

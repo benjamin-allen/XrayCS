@@ -9,8 +9,8 @@ namespace XrayCS
         private Type[] _excludes;
 
         public Entity Source { get => _source; private set => _source = value; }
-        public Type[] Matches { get => _matches; private set => _matches = value; }
-        public Type[] Excludes { get => _excludes; private set => _excludes = value; }
+        public Type[] Matches { get => _matches; protected set => _matches = value; }
+        public Type[] Excludes { get => _excludes; protected set => _excludes = value; }
 
         public Event(Entity source = null, Type[] matches = null, Type[] excludes = null)
         {
@@ -23,7 +23,6 @@ namespace XrayCS
             {
                 Matches = matches;
             }
-
             if (excludes == null)
             {
                 Excludes = new Type[0];
