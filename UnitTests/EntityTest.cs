@@ -15,6 +15,7 @@ namespace UnitTests
             entity = new Entity();
         }
 
+        #region Constructor Tests
         [TestMethod]
         public void BasicConstructor()
         {
@@ -31,7 +32,8 @@ namespace UnitTests
             Assert.AreEqual(entity.NumComponents, 0);
             Assert.AreEqual(entity.MaxComponents, 2);
         }
-
+        #endregion
+        #region Add<>() Tests
         [TestMethod]
         public void AddIncrementsComponentCount()
         {
@@ -74,7 +76,7 @@ namespace UnitTests
                 entity.Add<A>();
                 Assert.Equals(false, true);
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 Assert.AreEqual(entity.NumComponents, 1);
                 Assert.AreEqual(entity.NumRegisteredComponents, 1);
@@ -90,5 +92,52 @@ namespace UnitTests
             entity.Add<B>();
             entity.Add<C>();
         }
+
+        [TestMethod]
+        public void AddAfterRemoval()
+        {
+            entity.Add<A>();
+            entity.Add<B>();
+            entity.Remove<A>();
+            entity.Remove<B>();
+            Assert.AreEqual(entity.NumComponents, 0);
+            A reference = entity.Add<A>(new A());
+            B anotherReference = entity.Add<B>();
+            Assert.AreEqual(entity.NumComponents, 2);
+            Assert.AreEqual(entity.NumRegisteredComponents, 2);
+            Assert.AreNotEqual(reference, null);
+            Assert.AreNotEqual(anotherReference, null);
+        }
+
+        #endregion
+        #region Remove<>() Tests
+
+        [TestMethod]
+        public void RemoveDecrementsComponentCount()
+        {
+            entity.Add<A>();
+            entity.Remove<A>();
+            Assert.AreEqual(entity.NumComponents, 0);
+            Assert.AreEqual(entity.NumRegisteredComponents, 1);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException), "Remove attempted to delete an unmapped component")]
+        public void PreventRemovalOfNonExistantComponent()
+        {
+            entity.Add<A>();
+            entity.Remove<B>();
+        }
+
+        [TestMethod]
+        public void RemoveReturnsCorrectBool()
+        {
+            entity.Add<A>();
+            Assert.AreEqual(entity.Remove<A>(), true);
+            Assert.AreEqual(entity.Remove<A>(), false);
+            Assert.AreEqual(entity.Remove<B>(false), false);
+        }
+
+        #endregion
     }
 }

@@ -66,5 +66,17 @@ namespace XrayCS
                 return c;
             }
         }
+
+        public bool Remove<Component>(bool throwOnError = true) where Component : XrayCS.Component
+        {
+            int index = _map.Lookup<Component>(throwOnError);
+            if(index > -1 && _data[index] != null)
+            {
+                _data[index] = null;
+                NumComponents -= 1;
+                return true;
+            }
+            return false;
+        }
     }
 }
