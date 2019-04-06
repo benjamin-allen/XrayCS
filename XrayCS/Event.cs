@@ -7,25 +7,30 @@ namespace XrayCS
         private Entity _source;
         private Type[] _matches;
         private Type[] _excludes;
-        private string _data;
 
         public Entity Source { get => _source; private set => _source = value; }
         public Type[] Matches { get => _matches; private set => _matches = value; }
         public Type[] Excludes { get => _excludes; private set => _excludes = value; }
-        public string Data { get => _data; set => _data = value; }
 
-        public Event(Entity source = null, string data = "", Type[] matches = null, Type[] excludes = null)
+        public Event(Entity source = null, Type[] matches = null, Type[] excludes = null)
         {
             Source = source;
-            Data = data;
             if (matches == null)
             {
                 Matches = new Type[0];
+            }
+            else
+            {
+                Matches = matches;
             }
 
             if (excludes == null)
             {
                 Excludes = new Type[0];
+            }
+            else
+            {
+                Excludes = excludes;
             }
         }
 
