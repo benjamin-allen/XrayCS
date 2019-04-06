@@ -15,6 +15,8 @@ class PositionComponent : XrayCS.Component
         Y = y;
     }
 
+    public PositionComponent() : this(0, 0) { }
+
     protected override Component _Clone() { return this.Clone(); }
     public new PositionComponent Clone() { return new PositionComponent(X, Y); }
 }
