@@ -78,5 +78,15 @@ namespace XrayCS
             }
             return false;
         }
+
+        public Component Get<Component>(bool throwOnError = true) where Component : XrayCS.Component
+        {
+            int index = _map.Lookup<Component>(throwOnError);
+            if(index > -1)
+            {
+                return _data[index] as Component;
+            }
+            return null;
+        }
     }
 }
