@@ -223,6 +223,9 @@ namespace UnitTests
             Type[] exclude3 = { };
             Assert.AreEqual(entity.HasExcluding(match3, exclude3), false);
             Assert.AreEqual(entity.HasExcluding(exclude3, match3), false);
+            Type[] match4 = {typeof(A)};
+            Type[] exclude4 = { };
+            Assert.AreEqual(entity.HasExcluding(match4, exclude4), true);
         }
 
         #endregion
