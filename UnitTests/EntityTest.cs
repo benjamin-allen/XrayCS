@@ -139,5 +139,34 @@ namespace UnitTests
         }
 
         #endregion
+        #region Get<>() Tests
+
+        [TestMethod]
+        public void GetReturnsExpectedValues()
+        {
+            A a = entity.Add<A>();
+            entity.Add<B>();
+            entity.Remove<B>();
+            Assert.AreEqual(a, entity.Get<A>());
+            Assert.AreNotEqual(new A(), entity.Get<A>());
+            Assert.AreEqual(null, entity.Get<B>());
+            Assert.AreEqual(null, entity.Get<C>(false));
+        }
+
+        [TestMethod]
+        public void GetReturnsCorrectTypes()
+        {
+            entity.Add<A>();
+            Assert.AreNotEqual(typeof(XrayCS.Component), entity.Get<A>().GetType());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void PreventGettingNonRegisteredComponents()
+        {
+            entity.Get<A>();
+        }
+
+        #endregion
     }
 }
