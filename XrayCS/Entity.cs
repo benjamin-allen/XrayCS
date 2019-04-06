@@ -99,7 +99,7 @@ namespace XrayCS
             bool hasAll = true;
             foreach (Type type in components)
             {
-                int index = _map.Lookup(type);
+                int index = _map.Lookup(type, false);
                 hasAll &= (index  > -1 && _data[index] != null);
             }
             return hasAll;
@@ -110,7 +110,7 @@ namespace XrayCS
             bool hasAny = false;
             foreach (Type type in components)
             {
-                int index = _map.Lookup(type);
+                int index = _map.Lookup(type, false);
                 hasAny |= (index > -1 && _data[index] != null);
             }
             return hasAny;

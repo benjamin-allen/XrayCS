@@ -180,6 +180,31 @@ namespace UnitTests
             Assert.AreEqual(entity.Has<A>(), false);
         }
 
+        [TestMethod]
+        public void HasLists()
+        {
+            entity.Add<A>();
+            entity.Add<B>();
+            Type[] arr1 = { typeof(A) };
+            Type[] arr2 = { typeof(A), typeof(B) };
+            Type[] arr3 = { typeof(A), typeof(B), typeof(C) };
+            Type[] arr4 = { typeof(C) };
+            Assert.AreEqual(entity.HasAll(arr1), true);
+            Assert.AreEqual(entity.HasAll(arr2), true);
+            Assert.AreEqual(entity.HasAll(arr3), false);
+            Assert.AreEqual(entity.HasAny(arr1), true);
+            Assert.AreEqual(entity.HasAny(arr2), true);
+            Assert.AreEqual(entity.HasAny(arr3), true);
+            Assert.AreEqual(entity.HasAny(arr4), false);
+
+            entity.Remove<B>();
+            Assert.AreEqual(entity.HasAll(arr2), false);
+            Assert.AreEqual(entity.HasAny(arr3), true);
+
+            entity.Remove<A>();
+            Assert.AreEqual(entity.HasAny(arr3), false);
+        }
+
         #endregion
     }
 }
