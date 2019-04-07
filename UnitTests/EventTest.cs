@@ -147,7 +147,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void canSetPriority()
+        public void CanSetPriority()
         {
             MoveEvent moveEvent = new MoveEvent(3, 5);
             Assert.AreEqual(moveEvent.Priority, int.MaxValue);

@@ -16,7 +16,7 @@ namespace XrayCS
 
         public Event(Entity source = null, Type[] matches = null, Type[] excludes = null)
         {
-            priority = int.MaxValue;
+            Priority = int.MaxValue;
             Source = source;
             if (matches == null)
             {
