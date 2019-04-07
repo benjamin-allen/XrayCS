@@ -145,5 +145,14 @@ namespace UnitTests
             Assert.AreEqual(entity.Get<PositionComponent>().X, 14);
             Assert.AreEqual(entity.Get<PositionComponent>().Y, 8);
         }
+
+        [TestMethod]
+        public void canSetPriority()
+        {
+            MoveEvent moveEvent = new MoveEvent(3, 5);
+            Assert.AreEqual(moveEvent.Priority, int.MaxValue);
+            moveEvent.Priority = 4;
+            Assert.AreEqual(moveEvent.Priority, 4);
+        }
     }
 }

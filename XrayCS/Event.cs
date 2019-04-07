@@ -7,13 +7,16 @@ namespace XrayCS
         private Entity _source;
         private Type[] _matches;
         private Type[] _excludes;
+        private int priority;
 
         public Entity Source { get => _source; private set => _source = value; }
         public Type[] Matches { get => _matches; protected set => _matches = value; }
         public Type[] Excludes { get => _excludes; protected set => _excludes = value; }
+        public int Priority { get => priority; set => priority = value; }
 
         public Event(Entity source = null, Type[] matches = null, Type[] excludes = null)
         {
+            priority = int.MaxValue;
             Source = source;
             if (matches == null)
             {
