@@ -131,5 +131,19 @@ namespace UnitTests
             Assert.AreEqual(entity.Get<PositionComponent>().X, 0);
             Assert.AreEqual(entity.Get<PositionComponent>().Y, 0);
         }
+
+        [TestMethod]
+        public void ArrayOfEvents()
+        {
+            events[0] = new MoveEvent(3, 4);
+            events[1] = new MoveEvent(5, 5);
+            events[2] = new MoveEvent(6, -1);
+            foreach (Event @event in events)
+            {
+                @event.DispatchToEntity(entity);
+            }
+            Assert.AreEqual(entity.Get<PositionComponent>().X, 14);
+            Assert.AreEqual(entity.Get<PositionComponent>().Y, 8);
+        }
     }
 }
