@@ -102,5 +102,29 @@ namespace UnitTests
             Assert.AreEqual(entity2.Get<PositionComponent>().X, 3);
             Assert.AreEqual(entity2.Get<PositionComponent>().Y, -3);
         }
+
+        [TestMethod]
+        public void HonorsPriority()
+        {
+            publisher.AddEntity(entity1);
+            publisher.AddEntity(entity2);
+            publisher.AddEntity(entity3);
+            for (int i = 0; i < 3; i++)
+            {
+                MoveEvent moveEvent = new MoveEvent(i+1, -i-1);
+                moveEvent.Priority = -i;
+                publisher.AddEvent(moveEvent);
+            }
+            PositionComponent pc1 = entity1.Get<PositionComponent>();
+            publisher.ProcessTopEvent();
+            Assert.AreEqual(pc1.X, 3);
+            Assert.AreEqual(pc1.Y, -3);
+            publisher.ProcessTopEvent();
+            Assert.AreEqual(pc1.X, 5);
+            Assert.AreEqual(pc1.Y, -5);
+            publisher.ProcessTopEvent();
+            Assert.AreEqual(pc1.X, 6);
+            Assert.AreEqual(pc1.Y, -6);
+        }
     }
 }
