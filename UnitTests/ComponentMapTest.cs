@@ -86,7 +86,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(System.Exception), "More mappings were allowed than MaxSize specifies.")]
+        [ExpectedException(typeof(System.OutOfMemoryException), "More mappings were allowed than MaxSize specifies.")]
         public void PreventTooManyComponents()
         {
             map = new ComponentMap(1);      // Construct a map where only one component is allowed

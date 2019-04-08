@@ -11,7 +11,7 @@ namespace XrayCS
         }
     }
 
-    class Publisher
+    public class Publisher
     {
         private HashSet<Entity> _entities;
         private List<Event> _eventQueue;

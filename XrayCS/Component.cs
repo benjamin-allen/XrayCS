@@ -27,12 +27,12 @@
     /// There's some important things to note about this code.
     /// <list type="number">
     /// <item>
-    /// _Clone() is a `protected override`, and its implementation makes HealthComponent
-    /// non-abstract. Its return type is component because it must implement the signature of XrayCS.Component.
+    /// <see cref="_Clone()"/> is a protected override, and its implementation makes HealthComponent
+    /// non-abstract. Its return type is Component because it must implement the signature of XrayCS.Component.
     /// </item>
     /// <item>
-    /// Clone() is a `public new`, and it actually returns the new object. The
-    /// `new` keyword causes it to hide the `XrayCS.Component.Clone()` method.
+    /// <see cref="Clone()"/> is a public new, and it actually returns the new object. The
+    /// new keyword causes it to hide the XrayCS.Component.Clone() method.
     /// </item>
     /// <item>
     /// All derived components must implement a constructor without arguments, which is used as the
@@ -43,7 +43,7 @@
     public abstract class Component
     {
         /// <summary>
-        /// _Clone(): This method is overridden to facilitate cloning of components.
+        /// This method is overridden to facilitate cloning of components.
         /// </summary>
         /// <remarks>
         /// This is usually accomplished by calling the Clone() in the override implementation
