@@ -3,7 +3,7 @@
     // This is probably the most documented 3-lines of code I've made in my life.
 
     /// <summary>
-    /// Component: This is the base class for all components. See documentation for instructions on how to
+    /// This is the base class for all components. See documentation for instructions on how to
     /// extend this class.
     /// </summary>
     /// <example>
