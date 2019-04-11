@@ -248,5 +248,19 @@ namespace XrayCS
             }
             return entity;
         }
+
+        /// <summary>
+        /// Deletes all components owned by the entity.
+        /// </summary>
+        public void Clear()
+        {
+            NumComponents = 0;
+            // since data is filled in order, we can simplify the logic by deleting only up to
+            // our NumRegisteredComponents index, as that's the last possible position data can be
+            for(int i = 0; i < NumRegisteredComponents; i++)
+            {
+                _data[i] = null;
+            }
+        }
     }
 }

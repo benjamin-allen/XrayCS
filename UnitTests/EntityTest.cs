@@ -274,5 +274,29 @@ namespace UnitTests
             Assert.AreEqual(entity2.NumRegisteredComponents, 1);
         }
         #endregion
+        #region Miscellaneous Tests
+        [TestMethod]
+        public void ClearDeletesData()
+        {
+            entity.Add<A>();
+            entity.Add<B>();
+            entity.Add<C>();
+            A a1 = entity.Get<A>();
+            B b1 = entity.Get<B>();
+            C c1 = entity.Get<C>();
+            entity.Clear();
+            A a2 = entity.Get<A>(false);
+            B b2 = entity.Get<B>(false);
+            C c2 = entity.Get<C>(false);
+            Assert.AreEqual(a2, null);
+            Assert.AreEqual(b2, null);
+            Assert.AreEqual(c2, null);
+            Assert.AreNotEqual(a1, null);
+            Assert.AreNotEqual(b1, null);
+            Assert.AreNotEqual(c1, null);
+            Assert.AreEqual(entity.NumComponents, 0);
+            Assert.AreEqual(entity.NumRegisteredComponents, 3);
+        }
+        #endregion
     }
 }
