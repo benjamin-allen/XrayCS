@@ -52,35 +52,35 @@ namespace XrayCS
         }
 
         /// <summary>
-        /// Create a new component of type <typeparamref name="Component"/>, and allocate space
-        /// for it if necessary.
+        /// Create a new component of the specified type, and allocate space for it if necessary
         /// </summary>
-        /// <typeparam name="Component">The type of component to add.</typeparam>
+        /// <param name="componentType">A type object containing the type of the component. It
+        /// must be a derived type.</param>
         /// <param name="c">If this value is non-null, the new component will be constructed by
         /// <see cref="Component.Clone()"/></param>
         /// <returns>A reference to the new component.</returns>
         /// <exception cref="ArgumentException"> If the component map is full</exception>
-        /// <exception cref="ArgumentException"> If a component of type <typeparamref name="Component"/>
-        /// already exists in this entity.</exception>
-        public Component Add<Component>(Component c = null)
-            where Component : XrayCS.Component, new()
+        /// <exception cref="ArgumentException"> If a component of type 
+        /// <paramref name="componentType"/> already exists in this entity.</exception>
+        public Component Add(Type componentType, Component c = null)
         {
             bool mapIsFull = NumRegisteredComponents == MaxComponents;
-            bool mapContainsComponent = _map.Contains<Component>();
-            Component component = null;
+            bool mapContainsComponent = _map.Contains(componentType);
+            object component = Activator.CreateInstance(componentType);
             if (mapContainsComponent)
             {
-                component = _data[_map.Lookup<Component>()] as Component;
+                component = _data[_map.Lookup(componentType)];
             }   // We can now guarantee that (component = null) or (component = ref)
             if (mapContainsComponent && component == null)
             {   // Add the component back to the data and increment NumComponents
                 if (c == null)
                 {
-                    c = new Component();
+                    c = Activator.CreateInstance(componentType) as Component;
                 }
-                _data[_map.Lookup<Component>()] = c;
+                int index = _map.Lookup(componentType);
+                _data[index] = c.Clone();
                 NumComponents += 1;
-                return c;
+                return _data[index];
             }
             else if(mapContainsComponent && component != null)
             {
@@ -95,14 +95,31 @@ namespace XrayCS
             {
                 if(c == null)
                 {
-                    c = new Component();
+                    c = Activator.CreateInstance(componentType) as Component;
                 }
-                var index = _map.Register<Component>();
-                _data[index] = c;
+                int index = _map.Register(componentType);
+                _data[index] = c.Clone();
                 NumComponents += 1;
                 NumRegisteredComponents += 1;
-                return c;
+                return _data[index];
             }
+        }
+
+        /// <summary>
+        /// Create a new component of type <typeparamref name="Component"/>, and allocate space
+        /// for it if necessary.
+        /// </summary>
+        /// <typeparam name="Component">The type of component to add.</typeparam>
+        /// <param name="c">If this value is non-null, the new component will be constructed by
+        /// <see cref="Component.Clone()"/></param>
+        /// <returns>A reference to the new component.</returns>
+        /// <exception cref="ArgumentException"> If the component map is full</exception>
+        /// <exception cref="ArgumentException"> If a component of type <typeparamref name="Component"/>
+        /// already exists in this entity.</exception>
+        public Component Add<Component>(Component c = null)
+            where Component : XrayCS.Component
+        {
+            return Add(typeof(Component), c) as Component;
         }
 
         /// <summary>
@@ -210,6 +227,23 @@ namespace XrayCS
         public bool HasExcluding(Type[] toMatch, Type[] toExclude)
         {
             return HasAll(toMatch) && !HasAny(toExclude);
+        }
+
+        /// <summary>
+        /// Creates a duplicate entity by calling <see cref="Component.Clone"/> on each component.
+        /// </summary>
+        /// <returns>A reference to the new entity.</returns>
+        public Entity Clone()
+        {
+            Entity entity = new Entity((uint)MaxComponents);
+            foreach (var key in _map.AllKeys())
+            {
+                if(_data[_map.Lookup(key, false)] != null)
+                {
+                    
+                }
+            }
+            return null;
         }
     }
 }
