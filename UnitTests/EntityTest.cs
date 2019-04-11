@@ -297,6 +297,15 @@ namespace UnitTests
             Assert.AreEqual(entity.NumComponents, 0);
             Assert.AreEqual(entity.NumRegisteredComponents, 3);
         }
+
+        [TestMethod]
+        public void ClearDeletesMap()
+        {
+            entity.Add<A>();
+            entity.Clear(false);
+            Assert.AreEqual(entity.NumComponents, 0);
+            Assert.AreEqual(entity.NumRegisteredComponents, 0);
+        }
         #endregion
     }
 }

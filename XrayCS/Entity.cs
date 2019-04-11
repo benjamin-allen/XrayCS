@@ -235,6 +235,9 @@ namespace XrayCS
         /// Creates a duplicate entity by calling <see cref="Component.Clone"/> on each component.
         /// </summary>
         /// <returns>A reference to the new entity.</returns>
+        /// <remarks>The created entity is not guaranteed to have the same component layout as the
+        /// source entity. Attempting to use the same map for both entities will likely result in
+        /// an error of some type.</remarks>
         public Entity Clone()
         {
             Entity entity = new Entity((uint)MaxComponents);
@@ -252,11 +255,18 @@ namespace XrayCS
         /// <summary>
         /// Deletes all components owned by the entity.
         /// </summary>
-        public void Clear()
+        /// <param name="preserveMap">If true, the map and NumRegisteredComponents will not be
+        /// reset.</param>
+        public void Clear(bool preserveMap = true)
         {
             NumComponents = 0;
             // since data is filled in order, we can simplify the logic by deleting only up to
             // our NumRegisteredComponents index, as that's the last possible position data can be
+            if(preserveMap == false)
+            {
+                _map = new ComponentMap((uint)MaxComponents);
+                NumRegisteredComponents = 0;
+            }
             for(int i = 0; i < NumRegisteredComponents; i++)
             {
                 _data[i] = null;
