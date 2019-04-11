@@ -45,6 +45,16 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void AddWithoutGeneric()
+        {
+            entity.Add(typeof(A), null);
+            entity.Add(typeof(B));
+            entity.Remove<B>();
+            entity.Add(typeof(B));
+            Assert.AreEqual(entity.NumComponents, 2);
+        }
+
+        [TestMethod]
         public void AddReturnsComponentRef()
         {
             A a = entity.Add<A>();
@@ -56,7 +66,7 @@ namespace UnitTests
         {
             A a = new A();
             var reference = entity.Add<A>(a);
-            Assert.AreEqual(a, reference);
+            Assert.AreNotEqual(a, reference);
         }
 
         [TestMethod]
@@ -228,6 +238,41 @@ namespace UnitTests
             Assert.AreEqual(entity.HasExcluding(match4, exclude4), true);
         }
 
+        #endregion
+        #region Clone() Tests
+        [TestMethod]
+        public void CanCloneEntity()
+        {
+            entity.Add<A>();
+            entity.Add<B>();
+            Entity entity2 = entity.Clone();
+            Assert.AreNotEqual(entity2.Get<A>(), entity.Get<A>());
+            Assert.AreNotEqual(entity2.Get<B>(), entity.Get<B>());
+        }
+
+        [TestMethod]
+        public void CloneProperlyDuplicates()
+        {
+            entity.Add<PositionComponent>();
+            Entity entity2 = entity.Clone();
+            PositionComponent pc1 = entity.Get<PositionComponent>();
+            PositionComponent pc2 = entity2.Get<PositionComponent>();
+            pc2.X = int.MaxValue;
+            pc2.Y = int.MinValue;
+            Assert.AreNotEqual(pc1.X, pc2.X);
+            Assert.AreNotEqual(pc1.Y, pc2.Y);
+        }
+
+        [TestMethod]
+        public void CloneIgnoresMissingData()
+        {
+            entity.Add<A>();
+            entity.Add<B>();
+            entity.Remove<A>();
+            Entity entity2 = entity.Clone();
+            Assert.AreEqual(entity2.NumComponents, 1);
+            Assert.AreEqual(entity2.NumRegisteredComponents, 1);
+        }
         #endregion
     }
 }

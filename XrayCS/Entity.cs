@@ -62,6 +62,8 @@ namespace XrayCS
         /// <exception cref="ArgumentException"> If the component map is full</exception>
         /// <exception cref="ArgumentException"> If a component of type 
         /// <paramref name="componentType"/> already exists in this entity.</exception>
+        /// \todo: I'm very unahppy with the cyclomatic complexity of this function. There has to
+        /// be a better way to develop it.
         public Component Add(Type componentType, Component c = null)
         {
             bool mapIsFull = NumRegisteredComponents == MaxComponents;
@@ -116,7 +118,7 @@ namespace XrayCS
         /// <exception cref="ArgumentException"> If the component map is full</exception>
         /// <exception cref="ArgumentException"> If a component of type <typeparamref name="Component"/>
         /// already exists in this entity.</exception>
-        public Component Add<Component>(Component c = null)
+        public Component Add<Component>(XrayCS.Component c = null)
             where Component : XrayCS.Component
         {
             return Add(typeof(Component), c) as Component;
@@ -238,12 +240,13 @@ namespace XrayCS
             Entity entity = new Entity((uint)MaxComponents);
             foreach (var key in _map.AllKeys())
             {
-                if(_data[_map.Lookup(key, false)] != null)
+                int index = _map.Lookup(key, false);
+                if(_data[index] != null)
                 {
-                    
+                    entity.Add(key, _data[index]);
                 }
             }
-            return null;
+            return entity;
         }
     }
 }
