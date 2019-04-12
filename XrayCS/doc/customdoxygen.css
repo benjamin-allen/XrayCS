@@ -6,6 +6,20 @@
     --color-primary: #32ABD5;
 }
 
+.sm-dox a, .sm-dox a:focus, .sm-dox a:hover, .sm-dox a:active {
+	color: var(--color-primary);
+	font-family: "Segoe UI";
+	font-size: 20px;
+	font-weight: normal;
+	line-height: 36px;
+	text-shadow: 0 0px 0px;
+	background-image: none;
+}
+
+.sm-dox {
+	background-image: none;
+}
+
 /* The standard CSS for doxygen 1.8.15 */
 
 body, table, div, p, dl {
@@ -1021,14 +1035,12 @@ table.fieldtable {
 
 .navpath ul
 {
-	font-size: 11px;
-	background-image:url('tab_b.png');
-	background-repeat:repeat-x;
-	background-position: 0 -5px;
+	font-size: 12px;
+	background-image: none;
 	height:30px;
 	line-height:30px;
-	color:#8AA0CC;
-	border:solid 1px #C2CDE4;
+	color:var(--color-gray);
+	border:solid 1px var(--color-dark);
 	overflow:hidden;
 	margin:0px;
 	padding:0px;
@@ -1040,9 +1052,7 @@ table.fieldtable {
 	float:left;
 	padding-left:10px;
 	padding-right:15px;
-	background-image:url('bc_s.png');
-	background-repeat:no-repeat;
-	background-position:right;
+	background-image:none;
 	color:#364D7C;
 }
 
@@ -1050,12 +1060,12 @@ table.fieldtable {
 {
 	height:32px;
 	display:block;
-	text-decoration: none;
 	outline: none;
-	color: #283A5D;
-	font-family: 'Lucida Grande',Geneva,Helvetica,Arial,sans-serif;
-	text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);
-	text-decoration: none;        
+	color: var(--color-primary);
+	font-family: "Segoe UI",'Lucida Grande',Geneva,Helvetica,Arial,sans-serif;
+	text-shadow: 0px 0px 0px rgba(255, 255, 255, 0.9);
+	text-decoration: normal;
+	font-weight: normal;
 }
 
 .navpath li.navelem a:hover
