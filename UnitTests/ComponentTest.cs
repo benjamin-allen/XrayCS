@@ -95,5 +95,15 @@ namespace UnitTests
             Assert.AreNotEqual(position4.X, position2.X);     // ... So we'll change the values and check that they don't stick
             Assert.AreNotEqual(position4.Y, position2.Y);
         }
-}
+
+        [TestMethod]
+        public void TestJsonDecode()
+        {
+            PositionComponent pc = new PositionComponent();
+            string json = @"{ 'X': 6, 'Y': 3 }";
+            pc.LoadJson(json);
+            Assert.AreEqual(pc.X, 6);
+            Assert.AreEqual(pc.Y, 3);
+        }
+    }
 }

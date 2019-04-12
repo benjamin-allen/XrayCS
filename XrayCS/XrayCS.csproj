@@ -12,4 +12,8 @@
     <DocumentationFile>E:\Programming\C#\XrayCS\XrayCS\XrayCS.xml</DocumentationFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+  </ItemGroup>
+
 </Project>

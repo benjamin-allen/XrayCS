@@ -1,4 +1,6 @@
-﻿namespace XrayCS
+﻿using Newtonsoft.Json;
+
+namespace XrayCS
 {
     // This is probably the most documented 3-lines of code I've made in my life.
 
@@ -61,5 +63,10 @@
         /// </remarks>
         /// <returns>A new component object</returns>
         public Component Clone() { return this._Clone(); }
+
+        public virtual void LoadJson(string json)
+        {
+            JsonConvert.PopulateObject(json, this);
+        }
     }
 }
