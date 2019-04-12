@@ -64,6 +64,11 @@ namespace XrayCS
         /// <returns>A new component object</returns>
         public Component Clone() { return this._Clone(); }
 
+        /// <summary>
+        /// Populates an object's data from a JSON string. This method will overwrite existing
+        /// data in the component.
+        /// </summary>
+        /// <param name="json">The JSON data to </param>
         public virtual void LoadJson(string json)
         {
             JsonConvert.PopulateObject(json, this);
