@@ -69,6 +69,8 @@ namespace XrayCS
         /// data in the component.
         /// </summary>
         /// <param name="json">The JSON data to </param>
+        /// <remarks>This method is virtual in case derived classes wish to impose restrictions
+        /// on what can be loaded from JSON.</remarks>
         public virtual void LoadJson(string json)
         {
             JsonConvert.PopulateObject(json, this);
