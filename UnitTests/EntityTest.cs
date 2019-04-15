@@ -239,7 +239,7 @@ namespace UnitTests
         }
 
         #endregion
-        #region Clone() Tests
+        #region Clone() and Load() Tests
         [TestMethod]
         public void CanCloneEntity()
         {
@@ -272,6 +272,13 @@ namespace UnitTests
             Entity entity2 = entity.Clone();
             Assert.AreEqual(entity2.NumComponents, 1);
             Assert.AreEqual(entity2.NumRegisteredComponents, 1);
+        }
+        
+        [TestMethod]
+        public void SimpleLoadFromJson()
+        {
+            string json = @"{ 'components' : { 'PositionComponent' : {'X': 3, 'Y': 5} } }";
+            entity.LoadComponentsByJson(json);
         }
         #endregion
         #region Miscellaneous Tests

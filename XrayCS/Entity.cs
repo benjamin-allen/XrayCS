@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 
 namespace XrayCS
@@ -270,6 +271,28 @@ namespace XrayCS
             for(int i = 0; i < NumRegisteredComponents; i++)
             {
                 _data[i] = null;
+            }
+        }
+
+        public void LoadComponentsByJson(string json)
+        {
+            /* "components":
+             * [
+             *   "A": { },
+             *   "B": { },
+             *   ...
+             *   "Z": { }
+             * ]
+             */
+             // This loader is designed to work with arrays JSON objects named "components" 
+            JObject @object = JObject.Parse(json);
+            JToken components = @object.GetValue("components");
+            foreach (JToken entry in components)
+            {
+                Type type = Type.GetType();
+                Component component = entry.ToObject(type) as Component;
+                component.LoadJson(components[entry].ToString());
+                this.Add(type, component);
             }
         }
     }
