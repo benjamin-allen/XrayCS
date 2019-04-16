@@ -286,14 +286,13 @@ namespace XrayCS
              */
              // This loader is designed to work with arrays JSON objects named "components" 
             JObject @object = JObject.Parse(json);
-            JToken components = @object.GetValue("components");
-            foreach (JToken entry in components)
+            JObject components = @object["components"].Value<JObject>();
+            foreach (JProperty entry in components.Properties())
             {
-                Type type = Type.GetType();
-                Component component = entry.ToObject(type) as Component;
-                component.LoadJson(components[entry].ToString());
-                this.Add(type, component);
+                string componentType = entry.Name;
+                JObject componentData = components[componentType].Value<JObject>();
             }
+            return;
         }
     }
 }
