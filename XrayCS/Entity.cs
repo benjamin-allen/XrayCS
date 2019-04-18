@@ -17,6 +17,8 @@ namespace XrayCS
     /// \todo Implement entity loading and cloning.
     public class Entity
     {
+        private static Dictionary<string, Type> _loadableTypes = new Dictionary<string, Type>();
+
         private Component[] _data;
         private ComponentMap _map;
         private int _numRegisteredComponents;
@@ -38,6 +40,9 @@ namespace XrayCS
         /// </summary>
         /// <remarks>This may be less than <see cref="NumRegisteredComponents"/>, but never more.</remarks>
         public int NumComponents { get => _numCurrentComponents; private set => _numCurrentComponents = value; }
+
+
+        public static Dictionary<string, Type> LoadableTypes { get => _loadableTypes; }
 
         /// <summary>
         /// Constructs a new <see cref="Entity"/>.
@@ -289,10 +294,23 @@ namespace XrayCS
             JObject components = @object["components"].Value<JObject>();
             foreach (JProperty entry in components.Properties())
             {
-                string componentType = entry.Name;
-                JObject componentData = components[componentType].Value<JObject>();
+                string componentTypeName = entry.Name;
+                Type componentType = LoadableTypes[componentTypeName];
+                Component component = Add(componentType);
+                JObject componentData = components[componentTypeName].Value<JObject>();
+                component.LoadJson(componentData.ToString(Newtonsoft.Json.Formatting.None));
             }
             return;
+        }
+
+        public static void AddLoadableType(string typeKey, Type typeValue)
+        {
+            LoadableTypes.Add(typeKey, typeValue);
+        }
+
+        public static void ClearLoadableTypes()
+        {
+            LoadableTypes.Clear();
         }
     }
 }

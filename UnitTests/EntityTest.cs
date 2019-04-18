@@ -13,6 +13,7 @@ namespace UnitTests
         public void Setup()
         {
             entity = new Entity();
+            Entity.ClearLoadableTypes();
         }
 
         #region Constructor Tests
@@ -229,11 +230,11 @@ namespace UnitTests
             Type[] match2 = { };
             Type[] exclude2 = { };
             Assert.AreEqual(entity.HasExcluding(match2, exclude2), false);
-            Type[] match3 = {typeof(C)};
+            Type[] match3 = { typeof(C) };
             Type[] exclude3 = { };
             Assert.AreEqual(entity.HasExcluding(match3, exclude3), false);
             Assert.AreEqual(entity.HasExcluding(exclude3, match3), false);
-            Type[] match4 = {typeof(A)};
+            Type[] match4 = { typeof(A) };
             Type[] exclude4 = { };
             Assert.AreEqual(entity.HasExcluding(match4, exclude4), true);
         }
@@ -273,12 +274,25 @@ namespace UnitTests
             Assert.AreEqual(entity2.NumComponents, 1);
             Assert.AreEqual(entity2.NumRegisteredComponents, 1);
         }
-        
+
         [TestMethod]
         public void SimpleLoadFromJson()
         {
+            Entity.AddLoadableType("PositionComponent", typeof(PositionComponent));
             string json = @"{ 'components' : { 'PositionComponent' : {'X': 3, 'Y': 5} } }";
             entity.LoadComponentsByJson(json);
+            Assert.AreEqual(entity.Get<PositionComponent>().X, 3);
+            Assert.AreEqual(entity.Get<PositionComponent>().Y, 5);
+        }
+
+        [TestMethod]
+        public void OverwriteLoadFromJson()
+        {
+            Entity.AddLoadableType("PositionComponent", typeof(PositionComponent));
+            string json = @"{ 'components' : { 'PositionComponent' : {'X': 3, 'Y': 5}, 'PositionComponent' : {'X': 5, 'Y': 8}}}";
+            entity.LoadComponentsByJson(json);
+            Assert.AreEqual(entity.Get<PositionComponent>().X, 5);
+            Assert.AreEqual(entity.Get<PositionComponent>().Y, 8);
         }
         #endregion
         #region Miscellaneous Tests
@@ -312,6 +326,17 @@ namespace UnitTests
             entity.Clear(false);
             Assert.AreEqual(entity.NumComponents, 0);
             Assert.AreEqual(entity.NumRegisteredComponents, 0);
+        }
+
+        [TestMethod]
+        public void LoadableTypesBehavior()
+        {
+            Entity.AddLoadableType("A", typeof(A));
+            Entity.AddLoadableType("B", typeof(B));
+            Assert.AreEqual(Entity.LoadableTypes.Count, 2);
+            Assert.AreEqual(Entity.LoadableTypes["A"], typeof(A));
+            Entity.ClearLoadableTypes();
+            Assert.AreEqual(Entity.LoadableTypes.Count, 0);
         }
         #endregion
     }
