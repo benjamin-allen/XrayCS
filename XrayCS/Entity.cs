@@ -41,7 +41,10 @@ namespace XrayCS
         /// <remarks>This may be less than <see cref="NumRegisteredComponents"/>, but never more.</remarks>
         public int NumComponents { get => _numCurrentComponents; private set => _numCurrentComponents = value; }
 
-
+        /// <summary>
+        /// The components that may be loaded from JSON data. Any component attempting to use JSON
+        /// loading to build an entity must be registered in this map.
+        /// </summary>
         public static Dictionary<string, Type> LoadableTypes { get => _loadableTypes; }
 
         /// <summary>
@@ -279,6 +282,33 @@ namespace XrayCS
             }
         }
 
+        /// <summary>
+        /// Loads data into an entity via a json structure containing the object named
+        /// "components", which is made of further objects containing the actual data to be loaded.
+        /// See the remarks for further description and examples
+        /// </summary>
+        /// <param name="json">The json string to load into the entity.</param>
+        /// <remarks>
+        /// Below is a sample:
+        /// <code>
+        /// {
+        ///     "components": {
+        ///         "PositionComponent": {
+        ///             "X": 3,
+        ///             "Y": 2
+        ///         },
+        ///         "HealthComponent": {
+        ///             "Health": 40
+        ///         }
+        ///     }
+        /// }
+        /// </code>
+        /// Every component listed within the "components" object will attempt to be loaded.
+        /// All should be registered with the <see cref="AddLoadableType(string, Type)"/> method.
+        /// If a component is listed more than once, the last occurance will overwrite the others.
+        /// If the properties of each component json object have the same name as the properties
+        /// of the object class, each component class will not need to redefine their load methods.
+        /// </remarks>
         public void LoadComponentsByJson(string json)
         {
             /* "components":
@@ -303,11 +333,20 @@ namespace XrayCS
             return;
         }
 
+        /// <summary>
+        /// Adds the specified type to the system-wide typemap by the given string key.
+        /// This is used when loading data from JSON.
+        /// </summary>
+        /// <param name="typeKey">The name of the type as it appears in JSON.</param>
+        /// <param name="typeValue">The type of the object it should map to.</param>
         public static void AddLoadableType(string typeKey, Type typeValue)
         {
             LoadableTypes.Add(typeKey, typeValue);
         }
 
+        /// <summary>
+        /// Removes all entries from the LoadableTypes dictionary.
+        /// </summary>
         public static void ClearLoadableTypes()
         {
             LoadableTypes.Clear();
