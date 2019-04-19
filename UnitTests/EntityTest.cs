@@ -294,6 +294,33 @@ namespace UnitTests
             Assert.AreEqual(entity.Get<PositionComponent>().X, 5);
             Assert.AreEqual(entity.Get<PositionComponent>().Y, 8);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(System.Collections.Generic.KeyNotFoundException), "An entity was constructed with data not allowed by Entity.LoadableTypes")]
+        public void LoadFailsWithInvalidComponents()
+        {
+            string json = @"{ 'components' : { 'garbage' : {'data': 'This is garbage'}}}";
+            entity.LoadComponentsByJson(json);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Newtonsoft.Json.JsonReaderException), "An entity loaded mangled data.")]
+        public void PreventLoadingMangledData()
+        {
+            Entity.AddLoadableType("PositionComponent", typeof(PositionComponent));
+            string json = @"{ 'components' : { 'PositionComponent': {'X': 'mangl', 'y': true}}}";
+            entity.LoadComponentsByJson(json);
+        }
+
+        [TestMethod]
+        public void AllowLoadingMangledDataWithNoThrow()
+        {
+            Entity.AddLoadableType("PositionComponent", typeof(PositionComponent));
+            string json = @"{ 'components' : { 'PositionComponent': {'X': 'mangl', 'y': true}}}";
+            entity.LoadComponentsByJson(json, false);
+            Assert.AreEqual(entity.Get<PositionComponent>().X, 0);
+            Assert.AreEqual(entity.Get<PositionComponent>().Y, 0);
+        }
         #endregion
         #region Miscellaneous Tests
         [TestMethod]

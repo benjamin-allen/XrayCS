@@ -288,6 +288,8 @@ namespace XrayCS
         /// See the remarks for further description and examples
         /// </summary>
         /// <param name="json">The json string to load into the entity.</param>
+        /// <param name="throwOnError">If true, invalid json will cause an exception. If false,
+        /// invalid components will be added but populated with default values instead.</param>
         /// <remarks>
         /// Below is a sample:
         /// <code>
@@ -309,17 +311,12 @@ namespace XrayCS
         /// If the properties of each component json object have the same name as the properties
         /// of the object class, each component class will not need to redefine their load methods.
         /// </remarks>
-        public void LoadComponentsByJson(string json)
-        {
-            /* "components":
-             * [
-             *   "A": { },
-             *   "B": { },
-             *   ...
-             *   "Z": { }
-             * ]
-             */
-             // This loader is designed to work with arrays JSON objects named "components" 
+        /// <exception cref="KeyNotFoundException">If any type is not in the LoadableTypes.
+        /// </exception>
+        /// <exception cref="Newtonsoft.Json.JsonReaderException">Most invalid JSON causes this
+        /// exception.</exception>
+        public void LoadComponentsByJson(string json, bool throwOnError = true)
+        { 
             JObject @object = JObject.Parse(json);
             JObject components = @object["components"].Value<JObject>();
             foreach (JProperty entry in components.Properties())
@@ -328,7 +325,16 @@ namespace XrayCS
                 Type componentType = LoadableTypes[componentTypeName];
                 Component component = Add(componentType);
                 JObject componentData = components[componentTypeName].Value<JObject>();
-                component.LoadJson(componentData.ToString(Newtonsoft.Json.Formatting.None));
+                try
+                {
+                    component.LoadJson(componentData.ToString(Newtonsoft.Json.Formatting.None));
+                }
+                catch (Newtonsoft.Json.JsonReaderException)
+                {
+                    if (throwOnError) {
+                        throw;
+                    }
+                }
             }
             return;
         }
