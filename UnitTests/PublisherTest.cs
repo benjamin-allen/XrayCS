@@ -126,5 +126,27 @@ namespace UnitTests
             Assert.AreEqual(pc1.X, 6);
             Assert.AreEqual(pc1.Y, -6);
         }
+
+        [TestMethod]
+        public void HonorsSamePriority()
+        {
+            publisher.AddEntity(entity1);
+            publisher.AddEntity(entity2);
+            publisher.AddEntity(entity3);
+            for (int i = 0; i < 10; i++)
+            {
+                MoveEvent moveEvent = new MoveEvent(i + 1, -i - 1);
+                publisher.AddEvent(moveEvent);
+            }
+            PositionComponent pc1 = entity1.Get<PositionComponent>();
+            int t = 0;
+            for (int i = 10; i > 0; i--)
+            {
+                t += i;
+                publisher.ProcessTopEvent();
+                Assert.AreEqual(pc1.X, t);
+                Assert.AreEqual(pc1.Y, -t);
+            }
+        }
     }
 }

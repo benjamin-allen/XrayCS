@@ -53,6 +53,7 @@ namespace UnitTests
         public void RegistersComponents()
         {
             map.Register<A>();
+            map.Register(typeof(C));
         }
 
         [TestMethod]
@@ -82,7 +83,7 @@ namespace UnitTests
         public void PreventDoubleRegistration()
         {
             map.Register<A>();
-            map.Register<A>();              // Registering the same component twice should throw an exception
+            map.Register(typeof(A));        // Registering the same component twice should throw an exception
         }
 
         [TestMethod]
@@ -92,6 +93,13 @@ namespace UnitTests
             map = new ComponentMap(1);      // Construct a map where only one component is allowed
             map.Register<A>();
             map.Register<B>();              // Registering 2 component should throw an exception
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(System.ArgumentException), "A component was registered that was not a subclass of XrayCS.Component")]
+        public void PreventsNonSubclassRegistration()
+        {
+            map.Register(typeof(int));
         }
 
         [TestMethod]
@@ -106,7 +114,7 @@ namespace UnitTests
         public void LookupByGeneric()
         {
             map.Register<A>();
-            map.Register<B>();
+            map.Register(typeof(B));
             Assert.AreEqual(map.Lookup<B>(), 1);
             Assert.AreEqual(map.Lookup<A>(), 0);
         }
@@ -143,6 +151,19 @@ namespace UnitTests
         public void PreventLookupOfNonSubclass(Type type)
         {
             map.Lookup(type);    // We have to check this one directly because it's not enforced by the compiler
+        }
+
+        [TestMethod]
+        public void AllKeysIterator()
+        {
+            map.Register(typeof(A));
+            map.Register(typeof(B));
+            int i = 0;
+            foreach (Type key in map.AllKeys())
+            {
+                i += 1;
+            }
+            Assert.AreEqual(i, 2);
         }
     }
 }

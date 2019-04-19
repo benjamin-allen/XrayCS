@@ -13,6 +13,7 @@ namespace UnitTests
         public void Setup()
         {
             entity = new Entity();
+            Entity.ClearLoadableTypes();
         }
 
         #region Constructor Tests
@@ -45,6 +46,16 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void AddWithoutGeneric()
+        {
+            entity.Add(typeof(A), null);
+            entity.Add(typeof(B));
+            entity.Remove<B>();
+            entity.Add(typeof(B));
+            Assert.AreEqual(entity.NumComponents, 2);
+        }
+
+        [TestMethod]
         public void AddReturnsComponentRef()
         {
             A a = entity.Add<A>();
@@ -56,7 +67,7 @@ namespace UnitTests
         {
             A a = new A();
             var reference = entity.Add<A>(a);
-            Assert.AreEqual(a, reference);
+            Assert.AreNotEqual(a, reference);
         }
 
         [TestMethod]
@@ -219,15 +230,141 @@ namespace UnitTests
             Type[] match2 = { };
             Type[] exclude2 = { };
             Assert.AreEqual(entity.HasExcluding(match2, exclude2), false);
-            Type[] match3 = {typeof(C)};
+            Type[] match3 = { typeof(C) };
             Type[] exclude3 = { };
             Assert.AreEqual(entity.HasExcluding(match3, exclude3), false);
             Assert.AreEqual(entity.HasExcluding(exclude3, match3), false);
-            Type[] match4 = {typeof(A)};
+            Type[] match4 = { typeof(A) };
             Type[] exclude4 = { };
             Assert.AreEqual(entity.HasExcluding(match4, exclude4), true);
         }
 
+        #endregion
+        #region Clone() and Load() Tests
+        [TestMethod]
+        public void CanCloneEntity()
+        {
+            entity.Add<A>();
+            entity.Add<B>();
+            Entity entity2 = entity.Clone();
+            Assert.AreNotEqual(entity2.Get<A>(), entity.Get<A>());
+            Assert.AreNotEqual(entity2.Get<B>(), entity.Get<B>());
+        }
+
+        [TestMethod]
+        public void CloneProperlyDuplicates()
+        {
+            entity.Add<PositionComponent>();
+            Entity entity2 = entity.Clone();
+            PositionComponent pc1 = entity.Get<PositionComponent>();
+            PositionComponent pc2 = entity2.Get<PositionComponent>();
+            pc2.X = int.MaxValue;
+            pc2.Y = int.MinValue;
+            Assert.AreNotEqual(pc1.X, pc2.X);
+            Assert.AreNotEqual(pc1.Y, pc2.Y);
+        }
+
+        [TestMethod]
+        public void CloneIgnoresMissingData()
+        {
+            entity.Add<A>();
+            entity.Add<B>();
+            entity.Remove<A>();
+            Entity entity2 = entity.Clone();
+            Assert.AreEqual(entity2.NumComponents, 1);
+            Assert.AreEqual(entity2.NumRegisteredComponents, 1);
+        }
+
+        [TestMethod]
+        public void SimpleLoadFromJson()
+        {
+            Entity.AddLoadableType("PositionComponent", typeof(PositionComponent));
+            string json = @"{ 'components' : { 'PositionComponent' : {'X': 3, 'Y': 5} } }";
+            entity.LoadComponentsByJson(json);
+            Assert.AreEqual(entity.Get<PositionComponent>().X, 3);
+            Assert.AreEqual(entity.Get<PositionComponent>().Y, 5);
+        }
+
+        [TestMethod]
+        public void OverwriteLoadFromJson()
+        {
+            Entity.AddLoadableType("PositionComponent", typeof(PositionComponent));
+            string json = @"{ 'components' : { 'PositionComponent' : {'X': 3, 'Y': 5}, 'PositionComponent' : {'X': 5, 'Y': 8}}}";
+            entity.LoadComponentsByJson(json);
+            Assert.AreEqual(entity.Get<PositionComponent>().X, 5);
+            Assert.AreEqual(entity.Get<PositionComponent>().Y, 8);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(System.Collections.Generic.KeyNotFoundException), "An entity was constructed with data not allowed by Entity.LoadableTypes")]
+        public void LoadFailsWithInvalidComponents()
+        {
+            string json = @"{ 'components' : { 'garbage' : {'data': 'This is garbage'}}}";
+            entity.LoadComponentsByJson(json);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Newtonsoft.Json.JsonReaderException), "An entity loaded mangled data.")]
+        public void PreventLoadingMangledData()
+        {
+            Entity.AddLoadableType("PositionComponent", typeof(PositionComponent));
+            string json = @"{ 'components' : { 'PositionComponent': {'X': 'mangl', 'y': true}}}";
+            entity.LoadComponentsByJson(json);
+        }
+
+        [TestMethod]
+        public void AllowLoadingMangledDataWithNoThrow()
+        {
+            Entity.AddLoadableType("PositionComponent", typeof(PositionComponent));
+            string json = @"{ 'components' : { 'PositionComponent': {'X': 'mangl', 'y': true}}}";
+            entity.LoadComponentsByJson(json, false);
+            Assert.AreEqual(entity.Get<PositionComponent>().X, 0);
+            Assert.AreEqual(entity.Get<PositionComponent>().Y, 0);
+        }
+        #endregion
+        #region Miscellaneous Tests
+        [TestMethod]
+        public void ClearDeletesData()
+        {
+            entity.Add<A>();
+            entity.Add<B>();
+            entity.Add<C>();
+            A a1 = entity.Get<A>();
+            B b1 = entity.Get<B>();
+            C c1 = entity.Get<C>();
+            entity.Clear();
+            A a2 = entity.Get<A>(false);
+            B b2 = entity.Get<B>(false);
+            C c2 = entity.Get<C>(false);
+            Assert.AreEqual(a2, null);
+            Assert.AreEqual(b2, null);
+            Assert.AreEqual(c2, null);
+            Assert.AreNotEqual(a1, null);
+            Assert.AreNotEqual(b1, null);
+            Assert.AreNotEqual(c1, null);
+            Assert.AreEqual(entity.NumComponents, 0);
+            Assert.AreEqual(entity.NumRegisteredComponents, 3);
+        }
+
+        [TestMethod]
+        public void ClearDeletesMap()
+        {
+            entity.Add<A>();
+            entity.Clear(false);
+            Assert.AreEqual(entity.NumComponents, 0);
+            Assert.AreEqual(entity.NumRegisteredComponents, 0);
+        }
+
+        [TestMethod]
+        public void LoadableTypesBehavior()
+        {
+            Entity.AddLoadableType("A", typeof(A));
+            Entity.AddLoadableType("B", typeof(B));
+            Assert.AreEqual(Entity.LoadableTypes.Count, 2);
+            Assert.AreEqual(Entity.LoadableTypes["A"], typeof(A));
+            Entity.ClearLoadableTypes();
+            Assert.AreEqual(Entity.LoadableTypes.Count, 0);
+        }
         #endregion
     }
 }

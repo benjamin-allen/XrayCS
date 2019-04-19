@@ -1,9 +1,11 @@
-﻿namespace XrayCS
+﻿using Newtonsoft.Json;
+
+namespace XrayCS
 {
     // This is probably the most documented 3-lines of code I've made in my life.
 
     /// <summary>
-    /// Component: This is the base class for all components. See documentation for instructions on how to
+    /// This is the base class for all components. See documentation for instructions on how to
     /// extend this class.
     /// </summary>
     /// <example>
@@ -61,5 +63,17 @@
         /// </remarks>
         /// <returns>A new component object</returns>
         public Component Clone() { return this._Clone(); }
+
+        /// <summary>
+        /// Populates an object's data from a JSON string. This method will overwrite existing
+        /// data in the component.
+        /// </summary>
+        /// <param name="json">The JSON data to </param>
+        /// <remarks>This method is virtual in case derived classes wish to impose restrictions
+        /// on what can be loaded from JSON.</remarks>
+        public virtual void LoadJson(string json)
+        {
+            JsonConvert.PopulateObject(json, this);
+        }
     }
 }

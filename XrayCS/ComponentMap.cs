@@ -39,23 +39,43 @@ namespace XrayCS
         }
 
         /// <summary>
-        /// Adds a <typeparamref name="Component"/> to this map
+        /// Adds a <typeparamref name="Component"/> to this map.
         /// </summary>
-        /// <typeparam name="Component">The type of component to add. It must derive from <see cref="XrayCS.Component"/>.</typeparam>
-        /// <returns>The index of the newly-registerd component.</returns>
-        /// <exception cref="ArgumentException">If the component already exists in this map.</exception>
-        /// <exception cref="OutOfMemoryException">If the map already has <see cref="MaximumSize"/> elements.</exception>
+        /// <typeparam name="Component">The component to add. It must derive from 
+        /// <see cref="Component"/></typeparam>
+        /// <returns>The index of the newly-added component.</returns>
+        /// <remarks>This function simply calls the more generic one based on Type objects instead
+        /// of generics.</remarks>
         public int Register<Component>() where Component : XrayCS.Component
         {
-            if(Size < MaximumSize)
+            return Register(typeof(Component));
+        }
+
+        /// <summary>
+        /// Adds a component to this map
+        /// </summary>
+        /// <param name="component">The type of component to add. It must derive from
+        /// <see cref="XrayCS.Component"/>.</param>
+        /// <returns>The index of the newly-registerd component.</returns>
+        /// <exception cref="ArgumentException">If the component already exists in this map.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">If the map already has <see cref="MaximumSize"/>
+        /// elements.</exception>
+        public int Register(Type component)
+        {
+            if (!(component.IsSubclassOf(typeof(XrayCS.Component)) || component.Equals(typeof(XrayCS.Component))))
             {
-                if(_map.ContainsKey(typeof(Component)))     // _map should not contain the key already
+                throw new ArgumentException("Type " + component.ToString() + " is not derived from XrayCS.Component");
+            }
+            if (Size < MaximumSize)
+            {
+                if(_map.ContainsKey(component))     // _map should not contain the key already
                 {
-                    throw new ArgumentException("Component " + typeof(Component).ToString() + " already exists in this ComponentMap.");
+                    throw new ArgumentException("Component " + component.ToString() + " already exists in this ComponentMap.");
                 }
                 else
                 {
-                    _map.Add(typeof(Component), Size);
+                    _map.Add(component, Size);
                     return Size++;
                 }
             }
@@ -67,13 +87,25 @@ namespace XrayCS
         }
 
         /// <summary>
-        /// Determines whether this <see cref="ComponentMap"/> contains a given <typeparamref name="Component"/>.
+        /// Determines whether this <see cref="ComponentMap"/> contains a given
+        /// <typeparamref name="Component"/>.
         /// </summary>
         /// <typeparam name="Component">The component under test.</typeparam>
         /// <returns>True if the <see cref="ComponentMap"/> contains the component.</returns>
         public bool Contains<Component>() where Component : XrayCS.Component
         {
-            return _map.ContainsKey(typeof(Component));
+            return Contains(typeof(Component));
+        }
+
+        /// <summary>
+        /// Determines whether this <see cref="ComponentMap"/> contains a given
+        /// <paramref name="component"/>
+        /// </summary>
+        /// <param name="component">The component under test.</param>
+        /// <returns>True if the <see cref="ComponentMap"/> contains the component.</returns>
+        public bool Contains(Type component)
+        {
+            return _map.ContainsKey(component);
         }
 
         /// <summary>
@@ -125,6 +157,14 @@ namespace XrayCS
             {
                 return -1;
             }
+        }
+
+        /// <summary>
+        /// Returns all keys of the map.
+        /// </summary>
+        internal Dictionary<Type, int>.KeyCollection AllKeys()
+        {
+            return _map.Keys;
         }
     }
 }
