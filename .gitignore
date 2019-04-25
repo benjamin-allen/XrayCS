@@ -259,6 +259,6 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-/XrayCS/doc/footer.html
-/XrayCS/doc/header.html
 /XrayCS/doc/html/
+/XrayCS/doc/customdoxygen.css
+/XrayCS/doc/DoxygenLayout.xml
