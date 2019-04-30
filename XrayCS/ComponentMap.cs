@@ -119,7 +119,9 @@ namespace XrayCS
         {
             if(Contains<Component>())
             {
-                return _map.GetValueOrDefault(typeof(Component));
+                int index;
+                _map.TryGetValue(typeof(Component), out index);
+                return index;
             }
             else if(throwOnError)
             {
@@ -147,7 +149,9 @@ namespace XrayCS
             }
             if (_map.ContainsKey(component))
             {
-                return _map.GetValueOrDefault(component);
+                int index;
+                _map.TryGetValue(component, out index);
+                return index;
             }
             else if(throwOnError)
             {
