@@ -6,7 +6,7 @@
     <members>
         <member name="T:XrayCS.Component">
             <summary>
-            Component: This is the base class for all components. See documentation for instructions on how to
+            This is the base class for all components. See documentation for instructions on how to
             extend this class.
             </summary>
             <example>
@@ -30,12 +30,12 @@
             There's some important things to note about this code.
             <list type="number">
             <item>
-            <code>_Clone()</code> is a <code>protected override</code>, and its implementation makes HealthComponent
-            non-abstract. Its return type is component because it must implement the signature of XrayCS.Component.
+            <see cref="M:XrayCS.Component._Clone"/> is a protected override, and its implementation makes HealthComponent
+            non-abstract. Its return type is Component because it must implement the signature of XrayCS.Component.
             </item>
             <item>
-            <code>Clone()</code> is a <code>public new</code>, and it actually returns the new object. The
-            <code>new</code> keyword causes it to hide the XrayCS.Component.Clone() method.
+            <see cref="M:XrayCS.Component.Clone"/> is a public new, and it actually returns the new object. The
+            new keyword causes it to hide the XrayCS.Component.Clone() method.
             </item>
             <item>
             All derived components must implement a constructor without arguments, which is used as the
@@ -46,10 +46,10 @@
         </member>
         <member name="M:XrayCS.Component._Clone">
             <summary>
-            _Clone(): This method is overridden to facilitate cloning of components.
+            This method is overridden to facilitate cloning of components.
             </summary>
             <remarks>
-            This is usually accomplished by calling the <ref>Clone()</ref> in the override implementation
+            This is usually accomplished by calling the Clone() in the override implementation
             and rewriting the Clone() method to return a new component of the correct type.
             </remarks>
             <returns>A new component object</returns>
@@ -59,10 +59,480 @@
             This method is also modified to facilitate cloning of components.
             </summary>
             <remarks>
-            This method gets hidden when its derived, but it is used when <code>Clone()</code>-ing
+            This method gets hidden when its derived, but it is used when `Clone()`-ing
             arrays of components.
             </remarks>
-            <returns></returns>
+            <returns>A new component object</returns>
+        </member>
+        <member name="M:XrayCS.Component.LoadJson(System.String)">
+            <summary>
+            Populates an object's data from a JSON string. This method will overwrite existing
+            data in the component.
+            </summary>
+            <param name="json">The JSON data to </param>
+            <remarks>This method is virtual in case derived classes wish to impose restrictions
+            on what can be loaded from JSON.</remarks>
+        </member>
+        <member name="T:XrayCS.ComponentMap">
+            <summary>
+            Used for mapping System.Type objects to indices in an array. Duplicate types are
+            disallowed, and addition of types is permanent.
+            </summary>
+            <remarks>
+            Types added to the component map must be derived from XrayCS.Component.
+            This is enforced by the compiler.
+            </remarks>
+        </member>
+        <member name="P:XrayCS.ComponentMap.MaximumSize">
+            <summary>
+            The largest number of types the <see cref="T:XrayCS.ComponentMap"/> can support.
+            </summary>
+        </member>
+        <member name="P:XrayCS.ComponentMap.Size">
+            <summary>
+            The current number of types registered in the <see cref="T:XrayCS.ComponentMap"/>.
+            </summary>
+        </member>
+        <member name="M:XrayCS.ComponentMap.#ctor(System.UInt32)">
+            <summary>
+            Constructs a new <see cref="T:XrayCS.ComponentMap"/>.
+            </summary>
+            <param name="maximumSize">The maximum number of types allowed in this <see cref="T:XrayCS.ComponentMap"/>.</param>
+        </member>
+        <member name="M:XrayCS.ComponentMap.Register``1">
+            <summary>
+            Adds a <typeparamref name="Component"/> to this map.
+            </summary>
+            <typeparam name="Component">The component to add. It must derive from 
+            <see cref="T:XrayCS.Component"/></typeparam>
+            <returns>The index of the newly-added component.</returns>
+            <remarks>This function simply calls the more generic one based on Type objects instead
+            of generics.</remarks>
+        </member>
+        <member name="M:XrayCS.ComponentMap.Register(System.Type)">
+            <summary>
+            Adds a component to this map
+            </summary>
+            <param name="component">The type of component to add. It must derive from
+            <see cref="T:XrayCS.Component"/>.</param>
+            <returns>The index of the newly-registerd component.</returns>
+            <exception cref="T:System.ArgumentException">If the component already exists in this map.
+            </exception>
+            <exception cref="T:System.OutOfMemoryException">If the map already has <see cref="P:XrayCS.ComponentMap.MaximumSize"/>
+            elements.</exception>
+        </member>
+        <member name="M:XrayCS.ComponentMap.Contains``1">
+            <summary>
+            Determines whether this <see cref="T:XrayCS.ComponentMap"/> contains a given
+            <typeparamref name="Component"/>.
+            </summary>
+            <typeparam name="Component">The component under test.</typeparam>
+            <returns>True if the <see cref="T:XrayCS.ComponentMap"/> contains the component.</returns>
+        </member>
+        <member name="M:XrayCS.ComponentMap.Contains(System.Type)">
+            <summary>
+            Determines whether this <see cref="T:XrayCS.ComponentMap"/> contains a given
+            <paramref name="component"/>
+            </summary>
+            <param name="component">The component under test.</param>
+            <returns>True if the <see cref="T:XrayCS.ComponentMap"/> contains the component.</returns>
+        </member>
+        <member name="M:XrayCS.ComponentMap.Lookup``1(System.Boolean)">
+            <summary>
+            Locates the requested component in this <see cref="T:XrayCS.ComponentMap"/>.
+            </summary>
+            <typeparam name="Component">The component under test.</typeparam>
+            <param name="throwOnError">If true, failure to find the component will result in an <see cref="T:System.ArgumentException"/>.</param>
+            <returns>The index of the component, or -1 if <paramref name="throwOnError"/> is false.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="throwOnError"/> is true and no component is found.</exception>
+        </member>
+        <member name="M:XrayCS.ComponentMap.Lookup(System.Type,System.Boolean)">
+            <summary>
+            Locates the requested component in this <see cref="T:XrayCS.ComponentMap"/>.
+            </summary>
+            <param name="component">A <see cref="T:System.Type"/> containing the component under test.</param>
+            <param name="throwOnError">If true, failure to find the component will result in an <see cref="T:System.ArgumentException"/></param>
+            <returns>The index of the component, or -1 if <paramref name="throwOnError"/> is false.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="throwOnError"/> is set and no component is found.</exception>
+            <exception cref="T:System.ArgumentException">If <paramref name="component"/> is not a strict subclass of Component.</exception>
+        </member>
+        <member name="M:XrayCS.ComponentMap.AllKeys">
+            <summary>
+            Returns all keys of the map.
+            </summary>
+        </member>
+        <member name="T:XrayCS.Entity">
+            <summary>
+            Manages a collection of components and provides abstractions for their use
+            </summary>
+            <remarks>
+            <para>Compared to the disaster that is <see cref="T:XrayCS.Component"/>, this class is relatively
+            easy to describe. There is a maximum number of components that entities can create,
+            this is primarily done to control the size of the component array.</para>
+            <para>Additionally, note that all generic types passed to methods of this class 
+            must implement an argument-less constructor and must derive from <see cref="T:XrayCS.Component"/></para>
+            </remarks>
+            \todo Implement entity loading and cloning.
+        </member>
+        <member name="P:XrayCS.Entity.NumRegisteredComponents">
+            <summary>
+            The number of components registered in the <see cref="T:XrayCS.ComponentMap"/> of this entity.
+            </summary>
+        </member>
+        <member name="P:XrayCS.Entity.MaxComponents">
+            <summary>
+            <see cref="P:XrayCS.Entity.NumComponents"/> cannot equal or exceed this value.
+            </summary>
+        </member>
+        <member name="P:XrayCS.Entity.NumComponents">
+            <summary>
+            The current number of components constructed in this entity.
+            </summary>
+            <remarks>This may be less than <see cref="P:XrayCS.Entity.NumRegisteredComponents"/>, but never more.</remarks>
+        </member>
+        <member name="P:XrayCS.Entity.LoadableTypes">
+            <summary>
+            The components that may be loaded from JSON data. Any component attempting to use JSON
+            loading to build an entity must be registered in this map.
+            </summary>
+        </member>
+        <member name="M:XrayCS.Entity.#ctor(System.UInt32)">
+            <summary>
+            Constructs a new <see cref="T:XrayCS.Entity"/>.
+            </summary>
+            <param name="maxComponents">The number of components the entity is allowed to own</param>
+        </member>
+        <member name="M:XrayCS.Entity.Add(System.Type,XrayCS.Component)">
+            <summary>
+            Create a new component of the specified type, and allocate space for it if necessary
+            </summary>
+            <param name="componentType">A type object containing the type of the component. It
+            must be a derived type.</param>
+            <param name="c">If this value is non-null, the new component will be constructed by
+            <see cref="M:XrayCS.Component.Clone"/></param>
+            <returns>A reference to the new component.</returns>
+            <exception cref="T:System.ArgumentException"> If the component map is full</exception>
+            <exception cref="T:System.ArgumentException"> If a component of type 
+            <paramref name="componentType"/> already exists in this entity.</exception>
+            \todo: I'm very unahppy with the cyclomatic complexity of this function. There has to
+            be a better way to develop it.
+        </member>
+        <member name="M:XrayCS.Entity.Add``1(XrayCS.Component)">
+            <summary>
+            Create a new component of type <typeparamref name="Component"/>, and allocate space
+            for it if necessary.
+            </summary>
+            <typeparam name="Component">The type of component to add.</typeparam>
+            <param name="c">If this value is non-null, the new component will be constructed by
+            <see cref="M:XrayCS.Component.Clone"/></param>
+            <returns>A reference to the new component.</returns>
+            <exception cref="T:System.ArgumentException"> If the component map is full</exception>
+            <exception cref="T:System.ArgumentException"> If a component of type <typeparamref name="Component"/>
+            already exists in this entity.</exception>
+        </member>
+        <member name="M:XrayCS.Entity.Remove``1(System.Boolean)">
+            <summary>
+            Deletes the component from the entity by nullifying it.
+            </summary>
+            <typeparam name="Component">The component to delete.</typeparam>
+            <param name="throwOnError">If true, failure to find the component will result
+            in an exception.</param>
+            <returns>True if the component was successfully removed. False if it was not found
+            or was already deleted.</returns>
+            <exception cref="T:System.ArgumentException">If the <typeparamref name="Component"/> cannot be found.</exception>
+        </member>
+        <member name="M:XrayCS.Entity.Get``1(System.Boolean)">
+            <summary>
+            Returns a reference to a component.
+            </summary>
+            <typeparam name="Component">The component to return</typeparam>
+            <param name="throwOnError">If true, failure to find the component will result
+            in an exception.</param>
+            <returns>The component, or null if it is not found.</returns>
+            <exception cref="T:System.ArgumentException">If the <typeparamref name="Component"/> cannot be found.</exception>
+        </member>
+        <member name="M:XrayCS.Entity.Has``1">
+            <summary>
+            Check whether the entity owns an instance of the specified component.
+            </summary>
+            <typeparam name="Component">The component under test.</typeparam>
+            <returns>True if the entity owns the component.</returns>
+        </member>
+        <member name="M:XrayCS.Entity.HasAll(System.Type[])">
+            <summary>
+            Given a list of <see cref="T:System.Type"/>, check whether the entity owns all types in the list.
+            </summary>
+            <param name="components">Th types to be checked. If it is empty the function will always return
+            false.</param>
+            <returns>True if every element of <paramref name="components"/> is owned by the entity.</returns>
+        </member>
+        <member name="M:XrayCS.Entity.HasAny(System.Type[])">
+            <summary>
+            Given a list of <see cref="T:System.Type"/>, check whether the entity owns any of the types in the list.
+            </summary>
+            <param name="components">The types to be checked. If it is then the function will always return
+            false.</param>
+            <returns>True if any element of <paramref name="components"/> is owned by the entity.</returns>
+        </member>
+        <member name="M:XrayCS.Entity.HasExcluding(System.Type[],System.Type[])">
+            <summary>
+            Check whether the entity has all of the specified match components and none of the specified
+            exclude components.
+            </summary>
+            <param name="toMatch">The list of types to search for. This function returns false if any 
+            element of <paramref name="toMatch"/> is not found.</param>
+            <param name="toExclude">The list of types to search against. This function returns false if any
+            element of <paramref name="toExclude"/> is found.</param>
+            <returns>True if the entity has all components in <paramref name="toMatch"/> and none in
+            <paramref name="toExclude"/>.</returns>
+            <remarks>
+            This function behaves as logically expected for empty lists. If <paramref name="toMatch"/> is
+            empty, the function will always return false.
+            </remarks>
+        </member>
+        <member name="M:XrayCS.Entity.Clone">
+            <summary>
+            Creates a duplicate entity by calling <see cref="M:XrayCS.Component.Clone"/> on each component.
+            </summary>
+            <returns>A reference to the new entity.</returns>
+            <remarks>The created entity is not guaranteed to have the same component layout as the
+            source entity. Attempting to use the same map for both entities will likely result in
+            an error of some type.</remarks>
+        </member>
+        <member name="M:XrayCS.Entity.Clear(System.Boolean)">
+            <summary>
+            Deletes all components owned by the entity.
+            </summary>
+            <param name="preserveMap">If true, the map and NumRegisteredComponents will not be
+            reset.</param>
+        </member>
+        <member name="M:XrayCS.Entity.LoadComponentsByJson(System.String,System.Boolean)">
+            <summary>
+            Loads data into an entity via a json structure containing the object named
+            "components", which is made of further objects containing the actual data to be loaded.
+            See the remarks for further description and examples
+            </summary>
+            <param name="json">The json string to load into the entity.</param>
+            <param name="throwOnError">If true, invalid json will cause an exception. If false,
+            invalid components will be added but populated with default values instead.</param>
+            <remarks>
+            Below is a sample:
+            <code>
+            {
+                "components": {
+                    "PositionComponent": {
+                        "X": 3,
+                        "Y": 2
+                    },
+                    "HealthComponent": {
+                        "Health": 40
+                    }
+                }
+            }
+            </code>
+            Every component listed within the "components" object will attempt to be loaded.
+            All should be registered with the <see cref="M:XrayCS.Entity.AddLoadableType(System.String,System.Type)"/> method.
+            If a component is listed more than once, the last occurance will overwrite the others.
+            If the properties of each component json object have the same name as the properties
+            of the object class, each component class will not need to redefine their load methods.
+            </remarks>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If any type is not in the LoadableTypes.
+            </exception>
+            <exception cref="T:Newtonsoft.Json.JsonReaderException">Most invalid JSON causes this
+            exception.</exception>
+        </member>
+        <member name="M:XrayCS.Entity.AddLoadableType(System.String,System.Type)">
+            <summary>
+            Adds the specified type to the system-wide typemap by the given string key.
+            This is used when loading data from JSON.
+            </summary>
+            <param name="typeKey">The name of the type as it appears in JSON.</param>
+            <param name="typeValue">The type of the object it should map to.</param>
+        </member>
+        <member name="M:XrayCS.Entity.ClearLoadableTypes">
+            <summary>
+            Removes all entries from the LoadableTypes dictionary.
+            </summary>
+        </member>
+        <member name="T:XrayCS.Event">
+            <summary>
+            This is the base class for all Events. See documentation for instructions on how to extend
+            this class.
+            </summary>
+            <remarks>We will implement the derived class DamageEvent.
+            <code>
+            class DamageEvent : Event
+            {
+                private int _damage;
+                public int Damage { get => _damage; set => _damage = value; }
+                
+                public DamageEvent(int damage = 0) : 
+                    base(null, new Type[] { typeof(HealthComponent) }, null)
+                {
+                    Damage = damage;
+                }
+                
+                public override void CallOnMatch(Entity entity)
+                {
+                    HealthComponent hc = entity.Get&lt;HealthComponent&gt;();
+                    hc.Health -= Damage;
+                }
+            }
+            </code>
+            <para>A real version of this event would likely implement multiple constructors, or call 
+            the base constructor with the entity responsible for generating the DamageEvent. Access 
+            of fields is not restricted; the only reserved words for events are _source, _matches,
+            _excludes, and priority, and their associated properties.</para>
+            <para>The <see cref="M:XrayCS.Event.CallOnMatch(XrayCS.Entity)"/> method must be overridden by all derived
+            events. Provided certain conditions are met, it is safe to assume that the entity passed
+            through the arguments owns all components in the <see cref="P:XrayCS.Event.Matches"/> list, and that it
+            does not have any components in the <see cref="P:XrayCS.Event.Excludes"/> list. This is guaranteed by the
+            <see cref="M:XrayCS.Event.DispatchToEntity(XrayCS.Entity)"/> method, which is called by the 
+            <see cref="T:XrayCS.Publisher"/> object. These methods are public, however, and their descriptions
+            outline what, if any, edge conditions they can manage.</para>
+            </remarks>
+        </member>
+        <member name="P:XrayCS.Event.Source">
+            <summary>
+            The <see cref="T:XrayCS.Entity"/> responsible for generating this event.
+            </summary>
+        </member>
+        <member name="P:XrayCS.Event.Matches">
+            <summary>
+            The list of types an entity must have to be processed by this event.
+            </summary>
+        </member>
+        <member name="P:XrayCS.Event.Excludes">
+            <summary>
+            The list of types an entity must lack to be processed by this event.
+            </summary>
+        </member>
+        <member name="P:XrayCS.Event.Priority">
+            <summary>
+            Determines the position of the event in a <see cref="T:XrayCS.Publisher"/> event queue.
+            Highest values are processed last, and events with the same priority are processed
+            last-in-first-out.
+            </summary>
+        </member>
+        <member name="M:XrayCS.Event.#ctor(XrayCS.Entity,System.Type[],System.Type[])">
+            <summary>
+            Constructs a new event.
+            </summary>
+            <param name="source">The entity responsible for creating this event. </param>
+            <param name="matches">An entity processed by this event should have all of these
+            components.</param>
+            <param name="excludes">An entity processed by this event should have none of these
+            components.</param>
+            <remarks>
+            The <paramref name="source"/> entity is not used in any library code. It's provided as
+            a convenience for developers in case an event depends on some interplay between an
+            event creator and the entity being called on it. This field is most useful when
+            events are directly dispatched instead of processed with the <see cref="T:XrayCS.Publisher"/>.
+            </remarks>
+        </member>
+        <member name="M:XrayCS.Event.CallOnMatch(XrayCS.Entity)">
+            <summary>
+            Implementation of events occurs by overwriting this method.
+            </summary>
+            <param name="entity">The entity this event is occuring to. Provided so that events can
+            easily modify entity data.</param>
+        </member>
+        <member name="M:XrayCS.Event.DispatchToEntity(XrayCS.Entity)">
+            <summary>
+            Calls <see cref="M:XrayCS.Event.CallOnMatch(XrayCS.Entity)"/> on the <paramref name="entity"/> if it has the
+            necessary component configuration. This is the preferred way to send an event to an entity.
+            </summary>
+            <param name="entity"></param>
+        </member>
+        <member name="T:XrayCS.EventComparer">
+            <summary>
+            Used to sort events in descending priority.
+            </summary>
+            <remarks>
+            This is technically backwards of how a normal IComparer is implemented, but it is done
+            this way so that the next event to be processed is at the end of the list, which should
+            cause removals to be smoother than removing from the front of the list.
+            </remarks>
+        </member>
+        <member name="M:XrayCS.EventComparer.Compare(XrayCS.Event,XrayCS.Event)">
+            <summary>
+            Implements the IComparer interface. Note that this is reversed from a standard Compare
+            function.
+            </summary>
+            <param name="x">The first eventt.</param>
+            <param name="y">The second event.</param>
+            <returns>The relative priorities of the events.</returns>
+        </member>
+        <member name="T:XrayCS.Publisher">
+            <summary>
+            A class that manages events and entities. <see cref="T:XrayCS.Publisher"/> recreates the "systems"
+            portion of the entity-component-system paradigm by allowing events to be passed to many
+            entities.
+            </summary>
+        </member>
+        <member name="P:XrayCS.Publisher.Entities">
+            <summary>
+            The set of entities managed by the publisher.
+            </summary>
+            <remarks>A HashSet is used to avoid duplication of entities.</remarks>
+        </member>
+        <member name="P:XrayCS.Publisher.EventQueue">
+            <summary>
+            A list of the events currently awaiting processing in the publisher, sorted by their
+            priority. Numerically lower priorities are processed first.
+            </summary>
+        </member>
+        <member name="P:XrayCS.Publisher.NumEntities">
+            <summary>
+            The number of entities managed by this publisher.
+            </summary>
+        </member>
+        <member name="P:XrayCS.Publisher.Comparer">
+            <summary>
+            Used to compare event priorities for sorting.
+            </summary>
+        </member>
+        <member name="M:XrayCS.Publisher.#ctor">
+            <summary>
+            Constructs a new <see cref="T:XrayCS.Publisher"/> with no entities or events.
+            </summary>
+        </member>
+        <member name="M:XrayCS.Publisher.AddEntity(XrayCS.Entity)">
+            <summary>
+            Adds an entity to the publisher's management.
+            </summary>
+            <param name="entity">The entity to be added. A ref of this entity will be kept in the
+            <see cref="T:System.Collections.Generic.HashSet`1"/> owned by this <see cref="T:XrayCS.Publisher"/></param>
+            <returns>True if the entity was successfully added, false otherwise.</returns>
+        </member>
+        <member name="M:XrayCS.Publisher.RemoveEntity(XrayCS.Entity)">
+            <summary>
+            Removes an entity from the publisher's management.
+            </summary>
+            <param name="entity">A reference to the entity to remove.</param>
+            <returns>True if the entity was successfully removed, false otherwise.</returns>
+        </member>
+        <member name="M:XrayCS.Publisher.AddEvent(XrayCS.Event)">
+            <summary>
+            Adds an event to the publisher's queue.
+            </summary>
+            <param name="event">A reference to the event to add.</param>
+        </member>
+        <member name="M:XrayCS.Publisher.ProcessEvent(XrayCS.Event)">
+            <summary>
+            Immediately sends an event to all entities managed by the publisher.
+            </summary>
+            <param name="event">The event to send.</param>
+        </member>
+        <member name="M:XrayCS.Publisher.ProcessTopEvent">
+            <summary>
+            Sends the highest-priority event in the queue to all entities managed by the publisher.
+            </summary>
+        </member>
+        <member name="M:XrayCS.Publisher.ProcessQueue">
+            <summary>
+            Sends all events in the queue to all entities managed by the publisher.
+            </summary>
         </member>
     </members>
 </doc>

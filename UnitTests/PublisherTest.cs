@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
 using XrayCS;
 
 namespace UnitTests
@@ -148,5 +149,25 @@ namespace UnitTests
                 Assert.AreEqual(pc1.Y, -t);
             }
         }
+
+        [TestMethod]
+        public void TestGet()
+		{
+            publisher.AddEntity(entity1);
+            publisher.AddEntity(entity2);
+            publisher.AddEntity(entity3);
+
+            var result1 = publisher.Get(e => e.Has<A>());
+            Assert.AreEqual(1, result1.Count());
+            Assert.AreEqual(entity1, result1.First());
+
+            var result2 = publisher.Get(e => e.Has<A>() || e.Has<B>());
+            Assert.AreEqual(2, result2.Count());
+            Assert.AreEqual(entity1, result2.First());
+            Assert.AreEqual(entity2, result2.Last());
+
+            var result3 = publisher.Get(e => false);
+            Assert.AreEqual(0, result3.Count());
+		}
     }
 }

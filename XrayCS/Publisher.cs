@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.Linq.Expressions;
+using System.Linq;
 
 namespace XrayCS
 {
@@ -100,6 +102,11 @@ namespace XrayCS
             }
             return removed;
         }
+
+        public IEnumerable<Entity> Get(Func<Entity, bool> predicate)
+		{
+            return _entities.Where(predicate).Select(e => e);
+		}
 
         /// <summary>
         /// Adds an event to the publisher's queue.
